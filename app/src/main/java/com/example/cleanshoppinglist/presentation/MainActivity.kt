@@ -18,5 +18,6 @@ class MainActivity : AppCompatActivity() {
         viewModel.shopList.observe(this){   // Подписываемся на shopList и смотрим его лог
             Log.d("MainActivityTest", it.toString())
         }
+        viewModel.getShopList()
     }
 }
