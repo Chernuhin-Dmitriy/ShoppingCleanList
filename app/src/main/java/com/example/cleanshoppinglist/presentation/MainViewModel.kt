@@ -8,6 +8,7 @@ import com.example.cleanshoppinglist.domain.EditShopItemUseCase
 import com.example.cleanshoppinglist.domain.GetShopItemUseCase
 import com.example.cleanshoppinglist.domain.GetShopListUseCase
 import com.example.cleanshoppinglist.domain.ShopItem
+import com.example.cleanshoppinglist.domain.ShopListRepository
 
 class MainViewModel : ViewModel() {    // ViewModel не зависит от контекста, поэтому не используем его напрямую из AndroidViewModel
 
@@ -24,7 +25,14 @@ class MainViewModel : ViewModel() {    // ViewModel не зависит от к�
         shopList.value = list                           // value в главноем потоке/else - postValue
     }
 
+    fun delShopItem(shopItem: ShopItem){
+        delShopItemUseCase.delShopItem(shopItem)
+        getShopList()
+    }
 
-
-
+    fun changeShopItem(shopItem: ShopItem){
+        val newItem = shopItem.copy(enabled = !shopItem.enabled)
+        editShopItemUseCase.editShopItem(shopItem)
+        getShopList()
+    }
 }

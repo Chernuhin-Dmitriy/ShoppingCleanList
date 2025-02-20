@@ -15,9 +15,9 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         viewModel = ViewModelProvider(this).get(MainViewModel :: class.java) // инициализируем значением viewModel
-        viewModel.shopList.observe(this){   // Подписываемся на shopList и смотрим его лог
+        viewModel.shopList.observe(this){   // Подписываемся на изменения в shopList, но не обновляет его
             Log.d("MainActivityTest", it.toString())
         }
-        viewModel.getShopList()
+        viewModel.getShopList() // Обновляет live data и сам список shopList
     }
 }
