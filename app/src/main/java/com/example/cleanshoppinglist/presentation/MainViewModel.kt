@@ -8,7 +8,6 @@ import com.example.cleanshoppinglist.domain.EditShopItemUseCase
 import com.example.cleanshoppinglist.domain.GetShopItemUseCase
 import com.example.cleanshoppinglist.domain.GetShopListUseCase
 import com.example.cleanshoppinglist.domain.ShopItem
-import com.example.cleanshoppinglist.domain.ShopListRepository
 
 class MainViewModel : ViewModel() {    // ViewModel не зависит от контекста, поэтому не используем его напрямую из AndroidViewModel
 
@@ -18,21 +17,15 @@ class MainViewModel : ViewModel() {    // ViewModel не зависит от к�
     private val delShopItemUseCase = DelShopItemUseCase(repository)
     private val editShopItemUseCase = EditShopItemUseCase(repository)
 
-    val shopList = MutableLiveData<List<ShopItem>>()
+    val shopList = getShopListUseCase.getShopList()
 
-    fun getShopList() {                                  // Нет вз, передаем в LiveData
-        val list = getShopListUseCase.getShopList()
-        shopList.value = list                           // value в главноем потоке/else - postValue
-    }
 
-    fun delShopItem(shopItem: ShopItem){
+    fun deleteShopItem(shopItem: ShopItem){
         delShopItemUseCase.delShopItem(shopItem)
-        getShopList()
     }
 
-    fun changeShopItem(shopItem: ShopItem){
+    fun changeEnableState(shopItem: ShopItem){
         val newItem = shopItem.copy(enabled = !shopItem.enabled)
-        editShopItemUseCase.editShopItem(shopItem)
-        getShopList()
+        editShopItemUseCase.editShopItem(newItem)
     }
 }
