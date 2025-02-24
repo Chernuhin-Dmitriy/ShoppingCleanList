@@ -10,25 +10,25 @@
     android:layout_marginBottom="4dp"
     android:background="#8269B1"
     app:cardCornerRadius="4dp"
-    app:cardElevation="4dp"
+    app:cardElevation="1dp"
     app:cardUseCompatPadding="true">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#7A54CA"
+        android:background="#9588C7"
         android:orientation="horizontal"
         android:padding="16dp">
 
         <TextView
-            android:id="@+id/tv_name"
+            android:id="@+id/t_name"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:textColor="@color/white"
             android:textSize="16sp"
             android:textStyle="bold"
-            tools:text="Салфетки"/>
+            tools:text="Салфетки" />
 
         <TextView
             android:id="@+id/tv_count"
@@ -38,7 +38,7 @@
             android:textColor="@color/white"
             android:textSize="16sp"
             android:textStyle="bold"
-            tools:text="1"/>
+            tools:text="1" />
 
     </LinearLayout>
 
