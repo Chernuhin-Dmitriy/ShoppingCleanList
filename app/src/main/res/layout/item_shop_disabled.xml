@@ -21,7 +21,7 @@
         android:padding="16dp">
 
         <TextView
-            android:id="@+id/t_name"
+            android:id="@+id/tv_name"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"

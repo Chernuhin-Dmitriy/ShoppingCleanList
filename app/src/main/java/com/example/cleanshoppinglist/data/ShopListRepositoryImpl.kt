@@ -4,11 +4,13 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.cleanshoppinglist.domain.ShopItem
 import com.example.cleanshoppinglist.domain.ShopListRepository
+import java.util.SortedSet
 
 object ShopListRepositoryImpl: ShopListRepository {
 
-    private val shopList = mutableListOf<ShopItem>()
     private val shopListLD = MutableLiveData<List<ShopItem>>()
+    private val shopList = sortedSetOf<ShopItem>({o1, o2 -> o1.id.compareTo(o2.id)})
+
     private var autoIncrementId = 0
 
     init{
@@ -32,21 +34,21 @@ object ShopListRepositoryImpl: ShopListRepository {
     }
 
     override fun editShopItem(shopItem: ShopItem) {
-        val oldItem = getShopItem(shopItem)
+        val oldItem = getShopItem(shopItem.id)     // добавил id
         shopList.remove(oldItem)
         addShopItem(shopItem)
     }
 
-    override fun getShopItem(shopItem: ShopItem): ShopItem {
-        return shopList.find {it.id == shopItem.id} ?:
-        throw RuntimeException("Element with id ${shopItem.id} not found")
+    override fun getShopItem(shopItemId: Int): ShopItem {       // Изменил на Int
+        return shopList.find {it.id == shopItemId} ?:
+        throw RuntimeException("Element with id $shopItemId not found")
     }
 
     override fun getShopList(): LiveData<List<ShopItem>> {
         return shopListLD
     }
 
-    fun updateList(){
+    private fun updateList(){
         shopListLD.value = shopList.toList()
     }
 }

@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.example.cleanshoppinglist.R
@@ -26,14 +27,25 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showList(list: List<ShopItem>){
+        llShoplist.removeAllViews()
         for(shopItem in list){
             val layoutId = if(shopItem.enabled) {
                 R.layout.item_shop_enabled
             } else{
                 R.layout.item_shop_disabled
-                }
-
+            }
             val view = LayoutInflater.from(this).inflate(layoutId, llShoplist, false)
+
+            var tvName = view.findViewById<TextView>(R.id.tv_name)
+            var tvCount = view.findViewById<TextView>(R.id.tv_count)
+            tvName.text = shopItem.name
+            tvCount.text = shopItem.count.toString()
+
+            view.setOnLongClickListener {
+                viewModel.changeEnableState(shopItem)
+                true
+            }
+
             llShoplist.addView(view)
         }
     }
