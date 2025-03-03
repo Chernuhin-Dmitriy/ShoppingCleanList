@@ -7,46 +7,28 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.RecyclerView
 import com.example.cleanshoppinglist.R
 import com.example.cleanshoppinglist.domain.ShopItem
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var viewModel: MainViewModel
-    private lateinit var llShoplist: LinearLayout
+    private lateinit var adapter: ShopListAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        llShoplist = findViewById(R.id.ll_shop_list)
+        setupRecyclerView()
         viewModel = ViewModelProvider(this).get(MainViewModel :: class.java) // инициализируем значением viewModel
         viewModel.shopList.observe(this){   // Подписываемся на shopList и смотрим его лог
-            Log.d("MainActivityTest", it.toString())
-            showList(it)
+            adapter.shopList = it
         }
     }
 
-    private fun showList(list: List<ShopItem>){
-        llShoplist.removeAllViews()
-        for(shopItem in list){
-            val layoutId = if(shopItem.enabled) {
-                R.layout.item_shop_enabled
-            } else{
-                R.layout.item_shop_disabled
-            }
-            val view = LayoutInflater.from(this).inflate(layoutId, llShoplist, false)
-
-            var tvName = view.findViewById<TextView>(R.id.tv_name)
-            var tvCount = view.findViewById<TextView>(R.id.tv_count)
-            tvName.text = shopItem.name
-            tvCount.text = shopItem.count.toString()
-
-            view.setOnLongClickListener {
-                viewModel.changeEnableState(shopItem)
-                true
-            }
-
-            llShoplist.addView(view)
-        }
+    private fun setupRecyclerView(){
+        val rvShopList = findViewById<RecyclerView>(R.id.rv_shop_list)
+        adapter = ShopListAdapter()
+        rvShopList.adapter = adapter
     }
 }
