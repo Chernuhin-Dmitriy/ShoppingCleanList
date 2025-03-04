@@ -2,33 +2,111 @@ package com.example.cleanshoppinglist.presentation
 
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
-import android.widget.LinearLayout
-import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.example.cleanshoppinglist.R
-import com.example.cleanshoppinglist.domain.ShopItem
+
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var viewModel: MainViewModel
-    private lateinit var adapter: ShopListAdapter
+    private lateinit var shopListAdapter: ShopListAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setupRecyclerView()
-        viewModel = ViewModelProvider(this).get(MainViewModel :: class.java) // инициализируем значением viewModel
-        viewModel.shopList.observe(this){   // Подписываемся на shopList и смотрим его лог
-            adapter.shopList = it
+        viewModel = ViewModelProvider(this).get(MainViewModel::class.java) 
+        viewModel.shopList.observe(this) {   // Подписываемся на shopList и смотрим его лог
+            shopListAdapter.shopList = it
         }
     }
 
-    private fun setupRecyclerView(){
+    private fun setupRecyclerView() {
         val rvShopList = findViewById<RecyclerView>(R.id.rv_shop_list)
-        adapter = ShopListAdapter()
-        rvShopList.adapter = adapter
+
+        with(rvShopList) {
+            shopListAdapter = ShopListAdapter()
+            adapter = shopListAdapter
+            recycledViewPool.setMaxRecycledViews(
+                ShopListAdapter.VIEW_TYPE_ENABLED,
+                ShopListAdapter.MAX_POOL_SIZE
+            )
+            recycledViewPool.setMaxRecycledViews(
+                ShopListAdapter.VIEW_TYPE_DISABLED,
+                ShopListAdapter.MAX_POOL_SIZE
+            )
+        }
+        setupClickListener()
+        setupLongClickListener()
+        setupSwipeListener(rvShopList)
     }
+
+    private fun setupLongClickListener() {
+        shopListAdapter.onShopItemLongClickListener = {
+            viewModel.changeEnableState(it)
+        }
+    }
+
+    private fun setupClickListener() {
+        shopListAdapter.onShopItemClickListener = {
+            Log.d("MainActivity", it.toString())
+        }
+    }
+
+    private fun setupSwipeListener(rvShopList: RecyclerView) {
+        val callback = object : ItemTouchHelper.SimpleCallback(
+            0,
+            ItemTouchHelper.LEFT or
+                    ItemTouchHelper.RIGHT
+        ) {
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ): Boolean {
+                return false
+            }
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                val item = shopListAdapter.shopList[viewHolder.adapterPosition]
+                viewModel.deleteShopItem(item)
+            }
+        }
+        // Привязываем свайп к RecyclerView
+        val itemTouchHelper = ItemTouchHelper(callback).attachToRecyclerView(rvShopList)
+    }
+
+
+//    private fun setupSwipeToDelete() {
+//        val rvShopList = findViewById<RecyclerView>(R.id.rv_shop_list)
+//        var itemTouchCallback: ItemTouchHelper.SimpleCallback = object :
+//            ItemTouchHelper.SimpleCallback(
+//                0,
+//                ItemTouchHelper.LEFT or
+//                        ItemTouchHelper.RIGHT
+//            ) {
+//            override fun onMove(
+//                recyclerView: RecyclerView,
+//                viewHolder: RecyclerView.ViewHolder,
+//                target: RecyclerView.ViewHolder
+//            ): Boolean {
+//                Toast.makeText(this@MainActivity, "on Move", Toast.LENGTH_SHORT).show()
+//                return false
+//            }
+//
+//            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, swipeDir: Int) {
+//                Toast.makeText(this@MainActivity, "on Swiped ", Toast.LENGTH_SHORT).show()
+//                //Remove swiped item from list and notify the RecyclerView
+//                val position = viewHolder.adapterPosition
+//                viewModel.deleteShopItem(shopListAdapter.shopList[position])  //.remove(position)
+//                rvShopList.adapter?.notifyDataSetChanged()
+//            }
+//        }
+//        // Привязываем свайп к RecyclerView
+//        ItemTouchHelper(itemTouchCallback).attachToRecyclerView(rvShopList)
+//    }
 }
