@@ -3,4 +3,5 @@
     <string name="name">Name:</string>
     <string name="count">Count:</string>
     <string name="save">Save</string>
+    <string name="error">The input has error!</string>
 </resources>

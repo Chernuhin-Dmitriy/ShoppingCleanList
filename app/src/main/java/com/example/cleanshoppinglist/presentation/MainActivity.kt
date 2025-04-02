@@ -2,12 +2,13 @@ package com.example.cleanshoppinglist.presentation
 
 import android.os.Bundle
 import android.util.Log
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.example.cleanshoppinglist.R
+import com.example.cleanshoppinglist.presentation.ShopItemActivity.Companion.newIntentEditItem
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 
 class MainActivity : AppCompatActivity() {
@@ -22,6 +23,11 @@ class MainActivity : AppCompatActivity() {
         viewModel = ViewModelProvider(this).get(MainViewModel::class.java) 
         viewModel.shopList.observe(this) {   // Подписываемся на shopList и смотрим его лог
             shopListAdapter.submitList(it)
+        }
+        val buttonAddItem = findViewById<FloatingActionButton>(R.id.button_add_shop_item)
+        buttonAddItem.setOnClickListener {
+            val intent = ShopItemActivity.newIntentAddItem(this)
+            startActivity(intent)
         }
     }
 
@@ -54,6 +60,8 @@ class MainActivity : AppCompatActivity() {
     private fun setupClickListener() {
         shopListAdapter.onShopItemClickListener = {
             Log.d("MainActivity", it.toString())
+            val intent = newIntentEditItem(this, it.id)
+            startActivity(intent)
         }
     }
 
@@ -80,34 +88,4 @@ class MainActivity : AppCompatActivity() {
         val itemTouchHelper = ItemTouchHelper(callback)
         itemTouchHelper.attachToRecyclerView(rvShopList) // Прекрепляем к RecycleView
     }
-
-
-//    private fun setupSwipeToDelete() {
-//        val rvShopList = findViewById<RecyclerView>(R.id.rv_shop_list)
-//        var itemTouchCallback: ItemTouchHelper.SimpleCallback = object :
-//            ItemTouchHelper.SimpleCallback(
-//                0,
-//                ItemTouchHelper.LEFT or
-//                        ItemTouchHelper.RIGHT
-//            ) {
-//            override fun onMove(
-//                recyclerView: RecyclerView,
-//                viewHolder: RecyclerView.ViewHolder,
-//                target: RecyclerView.ViewHolder
-//            ): Boolean {
-//                Toast.makeText(this@MainActivity, "on Move", Toast.LENGTH_SHORT).show()
-//                return false
-//            }
-//
-//            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, swipeDir: Int) {
-//                Toast.makeText(this@MainActivity, "on Swiped ", Toast.LENGTH_SHORT).show()
-//                //Remove swiped item from list and notify the RecyclerView
-//                val position = viewHolder.adapterPosition
-//                viewModel.deleteShopItem(shopListAdapter.shopList[position])  //.remove(position)
-//                rvShopList.adapter?.notifyDataSetChanged()
-//            }
-//        }
-//        // Привязываем свайп к RecyclerView
-//        ItemTouchHelper(itemTouchCallback).attachToRecyclerView(rvShopList)
-//    }
 }

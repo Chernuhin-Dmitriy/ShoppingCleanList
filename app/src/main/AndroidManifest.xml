@@ -15,7 +15,8 @@
         <activity
             android:name=".presentation.ShopItemActivity"
             android:exported="false"
-            android:windowSoftInputMode="adjustResize"/>
+            android:windowSoftInputMode="adjustResize"
+            android:theme="@style/Theme.AppCompat.DayNight.DarkActionBar"/>
         <activity
             android:name=".presentation.MainActivity"
             android:exported="true"
