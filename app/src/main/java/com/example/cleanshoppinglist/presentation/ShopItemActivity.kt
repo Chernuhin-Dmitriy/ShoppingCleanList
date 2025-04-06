@@ -7,14 +7,14 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
 import android.widget.Button
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.ViewModelProvider
 import com.example.cleanshoppinglist.R
 import com.example.cleanshoppinglist.domain.ShopItem
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
+
+private const val TAG = "ShopItemActivity"
 
 class ShopItemActivity : AppCompatActivity() {
 
@@ -33,110 +33,97 @@ class ShopItemActivity : AppCompatActivity() {
         parseIntent()
         viewModel = ViewModelProvider(this)[ShopItemViewModel::class.java]
         initViews()
-        when(screenMode){
+        addTextChangedListeners()
+        launchRightMode()
+        observeViewModel()
+    }
+
+    private fun observeViewModel() {
+        viewModel.errorInputName.observe(this) {
+            val message = if (it) {
+                getString(R.string.error_input_name)
+            } else null
+            tilName.error = message
+        }
+        viewModel.errorInputCount.observe(this) {
+            val message = if (it) {
+                getString(R.string.error_input_count)
+            } else null
+            tilCount.error = message
+        }
+        viewModel.shouldCloseScreen.observe(this) {
+            finish()
+        }
+    }
+
+    private fun launchRightMode() {
+        when (screenMode) {
             MODE_ADD -> launchAddMode()
             MODE_EDIT -> launchEditMode()
         }
     }
 
+    private fun addTextChangedListeners() {
+        edName.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+                if ((s?.toString()?.length ?: 0) < 1) {
+                    tilName.error = getString(R.string.error_input_name)
+                }
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                viewModel.resetErrorInputName()
+            }
+        })
+
+        edCount.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+                if ((s?.toString()?.toIntOrNull() ?: 0) < 1) {
+                    tilCount.error = getString(R.string.error_input_count)
+                }
+                Log.d(TAG, "afterTextChanged")
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                viewModel.resetErrorCount()
+            }
+        })
+    }
+
     private fun launchAddMode() {
-        viewModel.errorInputName.observe(this) {
-            if (it) tilName.error = getString(R.string.error)
-        }
-
-        viewModel.errorInputCount.observe(this) {
-            if (it) tilCount.error = getString(R.string.error)
-        }
-
         buttonSave.setOnClickListener {
             viewModel.addShopItem(edName.text.toString(), edCount.text.toString())
         }
 
-        viewModel.shouldCloseScreen.observe(this) {
-            finish()
+        edName.setOnFocusChangeListener { view, hasFocus ->
+            if (!hasFocus && edName.text?.isEmpty() == true) {
+                tilName.error = getString(R.string.error_input_name)
+            }
         }
 
-//        edName.addTextChangedListener(object: TextWatcher{
-//            override fun afterTextChanged(s: Editable?) {
-//                TODO("Not yet implemented")
-//            }
-//
-//            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-//                TODO("Not yet implemented")
-//            }
-//
-//            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-//                tilName.error = null
-//            }
-//        })
-
-//        edCount.addTextChangedListener(object: TextWatcher{
-//            override fun afterTextChanged(s: Editable?) {
-//                TODO("Not yet implemented")
-//            }
-//
-//            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-//                TODO("Not yet implemented")
-//            }
-//
-//            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-//                tilCount.error = null
-//            }
-//        })
+        edCount.setOnFocusChangeListener { view, hasFocus ->
+            if (!hasFocus && edCount.text?.isEmpty() == true)
+                tilCount.error = getString(R.string.error_input_count)
+        }
     }
 
     private fun launchEditMode() {
-        viewModel.errorInputName.observe(this) {
-            if (it) tilName.error = getString(R.string.error)
-        }
-
-        viewModel.errorInputCount.observe(this) {
-            if (it) tilCount.error = getString(R.string.error)
-        }
-
         shopItemId = intent.getIntExtra(EXTRA_SHOP_ITEM_ID, ShopItem.UNDEFAINED_ID)
         viewModel.getShopItem(shopItemId)
-
         viewModel.shopItem.observe(this) { shopItem ->
             edName.setText(shopItem.name)
             edCount.setText(shopItem.count.toString())
         }
 
         buttonSave.setOnClickListener {
-            viewModel.editShopItem(edName.text.toString(), edCount.text.toString())
+            viewModel.editShopItem(edName.text?.toString(), edCount.text?.toString())
         }
-
-        viewModel.shouldCloseScreen.observe(this) {
-            finish()
-        }
-
-//        edName.addTextChangedListener(object: TextWatcher{
-//            override fun afterTextChanged(s: Editable?) {
-//                TODO("Not yet implemented")
-//            }
-//
-//            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-//                TODO("Not yet implemented")
-//            }
-//
-//            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-//                tilName.error = null
-//            }
-//        })
-//
-//        edCount.addTextChangedListener(object: TextWatcher{
-//            override fun afterTextChanged(s: Editable?) {
-//                TODO("Not yet implemented")
-//            }
-//
-//            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-//                TODO("Not yet implemented")
-//            }
-//
-//            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-//                tilCount.error = null
-//            }
-//        })
     }
 
     private fun parseIntent() {

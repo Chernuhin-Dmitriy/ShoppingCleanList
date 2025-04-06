@@ -74,7 +74,7 @@ class ShopItemViewModel : ViewModel() {
         }
     }
 
-    private fun validateInput(name: String, count: Int): Boolean{
+    fun validateInput(name: String, count: Int): Boolean{
         var result = true
         if(name.isBlank()){
             _errorInputName.value = true
@@ -87,11 +87,11 @@ class ShopItemViewModel : ViewModel() {
         return result
     }
 
-    private fun resetErrorInputName() {
+    fun resetErrorInputName() {
         _errorInputName.value = false
     }
 
-    private fun resetErrorCount() {
+    fun resetErrorCount() {
         _errorInputCount.value = false
     }
 
