@@ -5,4 +5,5 @@
     <string name="save">Save</string>
     <string name="error_input_name">Invalid name!</string>
     <string name="error_input_count">Invalid count!</string>
+    <string name="add_button">Add new shop item</string>
 </resources>
